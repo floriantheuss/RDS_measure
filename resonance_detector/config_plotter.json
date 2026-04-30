@@ -1,0 +1,17 @@
+{
+    "BandPass Filter Params": {
+        "lower cutoff": 2e-50,
+        "upper cutoff": 0.05
+    },
+    "Automated Fit Params": {
+        "fit mult window": 3.0,
+        "num repeated fits": 10,
+        "num points for next guess extrapolation": 0,
+        "max f (Hz)": 44000000.0,
+        "max gamma (Hz)": 600000.0,
+        "min f (Hz)": 15000000.0,
+        "min gamma (Hz)": 30000.0,
+        "max change f (Hz)": 500000.0,
+        "max change gamma (Hz)": 500000000.0
+    }
+}

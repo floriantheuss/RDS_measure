@@ -1,0 +1,14 @@
+{
+    "IP Addresses": {
+        "temperature": "GPIB0::11::INSTR",
+        "aux": "GPIB0::5::INSTR",
+        "vna": "USB0::0x0957::0x1709::MY54100795::INSTR",
+        "multimeter": "GPIB0::15::INSTR",
+        "xstage": "26006772",
+        "ystage": "26006755",
+        "zstage": "COM3",
+        "camera": "1",
+        "lockin": "GPIB0::5::INSTR"
+    },
+    "Aux Command": "TC."
+}
