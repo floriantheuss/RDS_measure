@@ -47,7 +47,7 @@ class ResonatingMembranesMaster (QMainWindow):
         # import ui file
         path     = str( Path(__file__).absolute() )
         temp     = path.split(self.separator)
-        temp[-1] = 'resonating_membranes_master.ui'
+        temp[-1] = 'rds_master.ui'
         temp_ui     = self.separator.join(temp)
         uic.loadUi(temp_ui, self)
 
@@ -55,7 +55,7 @@ class ResonatingMembranesMaster (QMainWindow):
         if self.operating_system in ['windows', 'Windows']:
             myappid = u'ResMem.Master'
             ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
-            temp[-1] = 'resonating_membranes_logo.png'
+            temp[-1] = 'rds_logo.png'
             logo_path = self.separator.join(temp)
             icon = QIcon(logo_path)
             self.setWindowIcon(icon)        

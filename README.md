@@ -22,7 +22,7 @@ A typical RDS measurement proceeds as follows:
 
 ## Modules
 
-### `resonating_membranes_master.py`
+### `rds_master.py`
 Main application entry point. Launches the PyQt5 window and starts the Twisted async reactor. Manages all sub-windows and the shared `deviceDict` used to pass instrument handles between modules.
 
 ### `device_manager/`
@@ -122,7 +122,7 @@ The configuration is stored in JSON files inside each module's directory:
 ## Running the application
 
 ```bash
-python resonating_membranes_master.py
+python rds_master.py
 ```
 
 This opens the master window. From there, use the sub-panel buttons to open the Device Manager (connect instruments first), then the Spectrum Recorder or Resonance Detector as needed.
