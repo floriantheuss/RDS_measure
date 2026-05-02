@@ -40,8 +40,8 @@
 font: 20pt &quot;Arial&quot;;</string>
     </property>
     <property name="text">
-     <string>Resonating
-Membranes</string>
+     <string>RDS
+Measure</string>
     </property>
    </widget>
    <widget class="QPushButton" name="ResonanceDetectorButton">
@@ -300,7 +300,7 @@ font: 8pt &quot;Arial&quot;;</string>
      <x>0</x>
      <y>0</y>
      <width>239</width>
-     <height>24</height>
+     <height>19</height>
     </rect>
    </property>
   </widget>
