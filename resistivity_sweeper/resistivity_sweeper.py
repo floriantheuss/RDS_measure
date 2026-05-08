@@ -24,7 +24,7 @@ from numpy.polynomial import polynomial
 import platform
 import twisted
 from twisted.internet.defer import inlineCallbacks, Deferred
-from Resonating_Membranes.resistivity_sweeper.data_view import DataViewer
+from RDS_measure.resistivity_sweeper.data_view import DataViewer
 from datetime import datetime
 
 

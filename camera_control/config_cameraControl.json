@@ -6,7 +6,7 @@
     "move to Y (um)": "6575",
     "position X (um)": "10.16",
     "position Y (um)": "0.0",
-    "update interval (s)": "0.3",
+    "update interval (s)": "0.5",
     "invert X": -1,
     "invert Y": 1,
     "backlash X (um)": "5",

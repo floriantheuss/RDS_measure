@@ -7,7 +7,7 @@
         "xstage": "26006772",
         "ystage": "26006755",
         "zstage": "COM3",
-        "camera": "1",
+        "camera": "36723",
         "lockin": "GPIB0::5::INSTR"
     },
     "Aux Command": "TC."

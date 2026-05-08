@@ -1,4 +1,3 @@
-from instrumental.drivers.cameras import uc480
 import numpy as np
 import matplotlib.pyplot as plt
 from PyQt5.QtWidgets import (QApplication,
@@ -22,7 +21,7 @@ import ctypes
 import platform
 import twisted
 from camera_control.align_images import AlignImages
-from shared.monitor.monitor import Monitor
+from instrument_libraries_and_control.monitor.monitor import Monitor
 from twisted.internet.defer import inlineCallbacks, Deferred
 
 
@@ -399,7 +398,7 @@ class Camera (QMainWindow):
 
     @inlineCallbacks
     def live_update (self, c=None):
-        yield self.cameraDevice.start_live_video()
+        yield self.cameraDevice.start_acquisition()
         while self.live_update_bool:
             # Blocks and returns True once the next frame is ready
             # frame_done = yield self.cameraDevice.wait_for_frame()
@@ -410,7 +409,7 @@ class Camera (QMainWindow):
                 self.img_item.setImage(self.image)
                 self.img_item.setLevels((self.min_intensity, self.max_intensity))
                 yield self.sleep(float(self.intervalLine.text()))
-        yield self.cameraDevice.stop_live_video()
+        yield self.cameraDevice.stop_acquisition()
     
     @inlineCallbacks
     def live_button_clicked (self, c=None):
@@ -702,8 +701,11 @@ class Camera (QMainWindow):
 
 
 if __name__ == '__main__':
-    cam = uc480.UC480_Camera(reopen_policy='new')
-    cam.open()
+    from instrument_libraries_and_control.instrument_libraries.thorlabs.tlcam import TLCAM
+
+    class MockParent:
+        deviceDict = {'camera': None, 'xstage': None, 'ystage': None, 'zstage': None, 'multimeter': None}
+        def update_all_device_dicts(self): pass
 
     QApplication.setStyle('Fusion')
     app = QApplication([])
@@ -711,7 +713,11 @@ if __name__ == '__main__':
     import qt5reactor
     qt5reactor.install()
     from twisted.internet import reactor
-    win = Camera(camera=cam, reactor=reactor, operating_system='windows')
+    parent = MockParent()
+    cam = TLCAM()
+    cam.connect()
+    parent.deviceDict['camera'] = cam
+    win = Camera(reactor=reactor, parent=parent, operating_system='windows')
     win.show()
     app.exec()
 

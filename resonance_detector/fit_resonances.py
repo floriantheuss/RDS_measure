@@ -2,7 +2,7 @@ import numpy as np
 from numpy import sqrt
 from lmfit.models import LorentzianModel, LinearModel
 from lmfit import Model, Parameter
-from Resonating_Membranes.resonance_detector.load_frequency_sweep import FreqSweepData, FreqSweep
+from RDS_measure.resonance_detector.load_frequency_sweep import FreqSweepData, FreqSweep
 import matplotlib.pyplot as plt
 
 

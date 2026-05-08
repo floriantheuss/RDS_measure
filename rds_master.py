@@ -16,15 +16,15 @@ import ctypes
 import pyvisa
 from copy import deepcopy
 import platform
-from Resonating_Membranes.resonance_detector.resonance_detector import ResonanceDetector
-from Resonating_Membranes.device_manager.device_manager import DeviceManager
-from Resonating_Membranes.spectrum_recorder.sweeper import Sweeper
-from Resonating_Membranes.camera_control.camera_control import Camera
-from shared.vna_control.vna_control import VNAControl
-from shared.temperature_control.temperature_control import TempControl
-from shared.lockin_control.lockin_control import LockInControl
-from Resonating_Membranes.resistivity_sweeper.data_view import DataViewer
-from Resonating_Membranes.resistivity_sweeper.resistivity_sweeper import RhoSweeper
+from RDS_measure.resonance_detector.resonance_detector import ResonanceDetector
+from RDS_measure.device_manager.device_manager import DeviceManager
+from RDS_measure.spectrum_recorder.sweeper import Sweeper
+from RDS_measure.camera_control.camera_control import Camera
+from instrument_libraries_and_control.vna_control.vna_control import VNAControl
+from instrument_libraries_and_control.temperature_control.temperature_control import TempControl
+from instrument_libraries_and_control.lockin_control.lockin_control import LockInControl
+from RDS_measure.resistivity_sweeper.data_view import DataViewer
+from RDS_measure.resistivity_sweeper.resistivity_sweeper import RhoSweeper
 
 
 

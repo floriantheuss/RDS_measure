@@ -12,8 +12,8 @@ from PyQt5 import uic, QtCore
 from PyQt5.QtGui import QIcon, QColor
 import pyqtgraph as pg
 from pathlib import Path
-from Resonating_Membranes.resonance_detector.load_frequency_sweep import FreqSweepData, FreqSweep
-from Resonating_Membranes.resonance_detector.fit_resonances import FitResonances
+from RDS_measure.resonance_detector.load_frequency_sweep import FreqSweepData, FreqSweep
+from RDS_measure.resonance_detector.fit_resonances import FitResonances
 import numpy as np
 import threading
 from time import time

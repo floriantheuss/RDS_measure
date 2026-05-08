@@ -7,13 +7,13 @@ from copy import deepcopy
 import ctypes
 import twisted
 from twisted.internet.defer import inlineCallbacks, Deferred
-from shared.instrument_libraries.keysight_e5063a import E5063A
-from shared.instrument_libraries.lakeshore_model331 import Model331
-from shared.instrument_libraries.keithley_2000multimeter import Multimeter2000
-from shared.instrument_libraries.signal_recovery_7265_DSP import SignalRecovery7265
-from shared.instrument_libraries.thorlabs_kst201 import ThorlabsKST201
+from instrument_libraries_and_control.instrument_libraries.keysight_e5063a import E5063A
+from instrument_libraries_and_control.instrument_libraries.lakeshore_model331 import Model331
+from instrument_libraries_and_control.instrument_libraries.keithley_2000multimeter import Multimeter2000
+from instrument_libraries_and_control.instrument_libraries.signal_recovery_7265_DSP import SignalRecovery7265
+from instrument_libraries_and_control.instrument_libraries.thorlabs.thorlabs_kst201 import ThorlabsKST201
+from instrument_libraries_and_control.instrument_libraries.thorlabs.tlcam import TLCAM
 from thorlabs_apt_device import TDC001
-from instrumental.drivers.cameras import uc480
 
 from PyQt5.QtWidgets import (QApplication,
                              QMainWindow,
@@ -260,7 +260,7 @@ class DeviceManager(QMainWindow):
                     # zstage_device = TDC001(zstage_inst)
                     if IPaddress.find('COM') >= 0:
                         zstage_device = TDC001(serial_port=IPaddress, home=False)
-                    elif len(IPaddress.strip) == 0:
+                    elif len(IPaddress.strip()) == 0:
                         zstage_device = TDC001(home=False)
                     else:
                         raise Exception('zstage device not connected yet; IP address must be COM port or empty ...')
@@ -274,10 +274,14 @@ class DeviceManager(QMainWindow):
             if device == 'camera':
                 try:
                     IPaddress  = self.cameraIPAddressBox.currentText()
-                    IPaddress  = int(IPaddress)
+                    if IPaddress == '':
+                        IPaddress = None
+                    # IPaddress  = int(IPaddress)
                     # camera_inst   = self.rm.open_resource(IPaddress)
-                    camera_device = uc480.UC480_Camera(id=IPaddress, reopen_policy='new')
+                    # camera_device = uc480.UC480_Camera(id=IPaddress, reopen_policy='new')
                     # camera_device = uc480.UC480_Camera(id=1, reopen_policy='new')
+                    camera_device = TLCAM(IPaddress)
+                    camera_device.connect()
                     self.deviceDict[device] = camera_device
                     self.IPaddressesDict[device] = IPaddress
                     self.connectCameraBtn.setText("Disconnect")
@@ -372,7 +376,7 @@ class DeviceManager(QMainWindow):
                     print(e)
             if device == 'camera':
                 try:
-                    self.deviceDict[device].close()
+                    self.deviceDict[device].close_dev()
                     self.deviceDict[device] = None
                     self.IPaddressesDict[device] = None
                     self.connectCameraBtn.setText("Connect")
