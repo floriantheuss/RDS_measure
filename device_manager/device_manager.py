@@ -11,8 +11,8 @@ from instrument_libraries_and_control.instrument_libraries.keysight_e5063a impor
 from instrument_libraries_and_control.instrument_libraries.lakeshore_model331 import Model331
 from instrument_libraries_and_control.instrument_libraries.keithley_2000multimeter import Multimeter2000
 from instrument_libraries_and_control.instrument_libraries.signal_recovery_7265_DSP import SignalRecovery7265
-from instrument_libraries_and_control.instrument_libraries.thorlabs.thorlabs_kst201 import ThorlabsKST201
-from instrument_libraries_and_control.instrument_libraries.thorlabs.tlcam import TLCAM
+from instrument_libraries_and_control.instrument_libraries.thorlabs_kst201_stepper_motor import ThorlabsKST201
+from instrument_libraries_and_control.instrument_libraries.thorlabs_kiralux_camera import ThorlabsKiralux
 from thorlabs_apt_device import TDC001
 
 from PyQt5.QtWidgets import (QApplication,
@@ -280,7 +280,7 @@ class DeviceManager(QMainWindow):
                     # camera_inst   = self.rm.open_resource(IPaddress)
                     # camera_device = uc480.UC480_Camera(id=IPaddress, reopen_policy='new')
                     # camera_device = uc480.UC480_Camera(id=1, reopen_policy='new')
-                    camera_device = TLCAM(IPaddress)
+                    camera_device = ThorlabsKiralux(IPaddress)
                     camera_device.connect()
                     self.deviceDict[device] = camera_device
                     self.IPaddressesDict[device] = IPaddress

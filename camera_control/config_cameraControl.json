@@ -1,6 +1,6 @@
 {
-    "acceleration (um/s^2)": 5.0,
-    "velocity (um/s)": 5.0,
+    "acceleration (um/s^2)": 1000.0,
+    "velocity (um/s)": 500.0,
     "step size (um)": 1.0,
     "move to X (um)": "7000",
     "move to Y (um)": "6575",
@@ -12,7 +12,7 @@
     "backlash X (um)": "5",
     "backlash Y (um)": "6",
     "last X direction": -1.0,
-    "last Y direction": 1.0,
+    "last Y direction": -1,
     "pixel to distance conversion": "0.6",
     "camera - motion stages misalignment angle (degree)": "-5.5",
     "laser spot location x (pixel)": 446,
