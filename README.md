@@ -33,7 +33,8 @@ Hardware abstraction layer. Supports:
 - **Thorlabs KST201** — X/Y motorized translation stages
 - **Thorlabs TDC001** — Z-axis translation stage
 - **Signal Recovery 7265 DSP** — Lock-in amplifier
-- **uEye UC480** — USB camera
+- **Thorlabs Kiralux** — USB camera
+- **Quantum Design OptiCool** — Cryostat/magnet system
 
 ### `spectrum_recorder/`
 Controls the VNA to record frequency sweeps. Collects metadata (temperature, laser currents, VNA settings) and saves each sweep as a `.npz` file. Supports periodic acquisition and single-scan mode with optional auto-tracking and auto-alignment.
@@ -50,7 +51,7 @@ L(f) = A·exp(iφ) / (γ/2 − (f − f₀)·i)  +  c₀ + c₁·i  +  (m₀ + m
 where f₀ is the resonance frequency, γ the linewidth (damping), A the amplitude, φ the phase, and the remaining terms model a linear background.
 
 ### `camera_control/`
-Live camera feed from a uEye UC480 camera with manual and automated sample alignment. Automated alignment registers the current image against a reference image using affine transforms (OpenCV) and iteratively drives the Thorlabs X/Y stages to minimize the offset.
+Live camera feed from a Thorlabs Kiralux camera with manual and automated sample alignment. Automated alignment registers the current image against a reference image using affine transforms (OpenCV) and iteratively drives the Thorlabs X/Y stages to minimize the offset.
 
 ### `resistivity_sweeper/`
 Lock-in amplifier based AC resistance/impedance measurements as a function of temperature. Plots X, Y, amplitude, and phase in real time.
@@ -59,16 +60,44 @@ Lock-in amplifier based AC resistance/impedance measurements as a function of te
 
 ## Installation
 
+### Quick setup
+
+**1. Create and activate the conda environment**
+```bash
+conda create -n rds_measure python=3.13 -y
+conda activate rds_measure
+```
+
+**2. Install Python packages**
+```bash
+pip install PyQt5 pyqtgraph twisted qt5reactor PyVISA pyvisa-py numpy scipy lmfit matplotlib opencv-python imutils pillow pandas pyserial pythonnet thorlabs-apt-device MultiPyVu
+```
+
+**3. Thorlabs Kiralux camera**
+- Install **ThorCam** from thorlabs.com/software-pages/ThorCam (not ThorImageCAM — it does not install the drivers in the correct place). During installation, make sure to select the USB driver.
+- On the same page, go to the **Programming Interfaces** tab and download *Windows SDK and Doc. for Scientific Cameras*.
+- Install the Python package from the zip inside the downloaded SDK folder:
+  ```bash
+  pip install "path\to\Scientific Camera Interfaces\SDK\Python Toolkit\thorlabs_tsi_camera_python_sdk_package.zip"
+  ```
+- Copy the `Native_64_lib` folder from `Scientific Camera Interfaces\SDK\Native Toolkit\dlls\` into the `thorlabs_tsi_sdk` folder inside your environment's `Lib\site-packages\`.
+
+**4. Thorlabs KST201 X/Y stages**
+- Install **Kinesis** from thorlabs.com/software-pages/Motion_Control — this installs the necessary drivers and DLLs.
+
+**5. Shared instrument libraries**
+- Ensure the `instrument_libraries_and_control` package (custom drivers for all instruments) is on your Python path.
+
 ### Python version
 
-Python 3.8 or later is recommended (the package has been tested on Windows and macOS).
+Python 3.13 is recommended.
 
 ### Required packages
 
 Install the core dependencies with pip:
 
 ```bash
-pip install PyQt5 pyqtgraph twisted pyvisa numpy scipy lmfit matplotlib opencv-python imutils
+pip install PyQt5 pyqtgraph twisted qt5reactor PyVISA pyvisa-py numpy scipy lmfit matplotlib opencv-python imutils pillow pandas pyserial pythonnet thorlabs-apt-device MultiPyVu
 ```
 
 | Package | Purpose |
@@ -91,8 +120,9 @@ Some instruments require additional drivers or packages that are not on PyPI:
 | Instrument | Package / Driver |
 |---|---|
 | Thorlabs TDC001 Z-stage | `thorlabs_apt_device` — `pip install thorlabs-apt-device` |
-| uEye UC480 camera | `instrumental` — `pip install instrumental-lib`; also requires the IDS uEye SDK from the IDS website |
-| Thorlabs KST201 X/Y stages | Requires the Thorlabs Kinesis software and the `thorlabs_apt` or `thorlabs_apt_device` Python wrapper |
+| Thorlabs Kiralux camera | Install ThorCam for USB drivers, then install `thorlabs_tsi_sdk` from the SDK zip (see Quick setup above and `thorlabs_instruments_notes.md` for details) |
+| Thorlabs KST201 X/Y stages | Install Kinesis software for drivers; custom Python driver in `instrument_libraries_and_control` uses `pythonnet` to call the Kinesis .NET DLLs (see `thorlabs_instruments_notes.md`) |
+| Quantum Design OptiCool | `MultiPyVu` — `pip install MultiPyVu`; custom driver in `instrument_libraries_and_control` |
 
 Additionally, a VISA backend must be installed for PyVISA to communicate with GPIB/USB instruments:
 
@@ -104,7 +134,7 @@ pip install pyvisa-py
 
 ### Shared instrument libraries
 
-The package imports custom instrument driver wrappers from a `shared.instrument_libraries` namespace (e.g., `keysight_e5063a`, `lakeshore_model331`, `keithley_2000multimeter`, `signal_recovery_7265_DSP`, `thorlabs_kst201`). Ensure the parent `measurement_control` directory containing the `shared/` package is on the Python path.
+The package imports custom instrument driver wrappers from the `instrument_libraries_and_control` package (e.g., `keysight_e5063a`, `lakeshore_model331`, `keithley_2000multimeter`, `signal_recovery_7265_DSP`, `thorlabs_kst201_stepper_motor`, `thorlabs_kiralux_camera`, `quantum_design_opticool`). Ensure this package is installed or its parent directory is on the Python path.
 
 ---
 
