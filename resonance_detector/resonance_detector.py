@@ -87,9 +87,13 @@ class ResonanceDetector (QMainWindow):
     def initialize_data_and_fit_variables(self):
         # variables to store all data
         self.filenames           = None
-        self.temperatures        = None
-        # self.times               = None  
         self.sweep_variable_dict = {}
+        self.known_keys = [
+            'time (s)', 'External Temperature (K)',
+            'OptiCool control temperature (K)', 'OptiCool aux temperature (K)', 'OptiCool field (T)',
+            'drive laser current (mA)', 'probe laser current (mA)',
+            'IF bandwidth (Hz)', 'VNA power (dBm)', 'Probe laser DC signal (mV)',
+        ]
 
         self.current_sweep = None
 
@@ -211,7 +215,7 @@ class ResonanceDetector (QMainWindow):
 
     
     def create_temp_dep_plots (self):
-        self.saveTempDepButton.clicked.connect(self.save_temp_dep_data)
+        self.saveTempDepButton.clicked.connect(self.save_sweep_dep_data)
         self.plotResNumComboBox.currentIndexChanged.connect(self.change_plotted_resonance)
 
         self.plot_res_num = 0
@@ -310,8 +314,14 @@ class ResonanceDetector (QMainWindow):
         except Exception as e:
             time = np.nan
         return time
-    
-       
+
+    def get_label_from_filename(self, filename):
+        t = self.get_time_from_filename(filename)
+        if not np.isnan(t):
+            return datetime.fromtimestamp(t).strftime('%Y-%m-%d  %H:%M:%S')
+        return filename.split(self.separator)[-1]
+
+
     def browse_button_clicked (self, plot_dir=None):
         # this is just so that in case someone presses the browse button while the autorefresh is on, it will turn it off
         if self.autorefresh_enabled:
@@ -328,23 +338,12 @@ class ResonanceDetector (QMainWindow):
                 self.filenames    = self.get_filenames_from_folder(self.plotterDir)
 
                 dat = np.load(self.filenames[0])
-                if 'time (s)' in dat.files:
-                    self.sweep_variable_dict['time (s)'] = np.zeros(len(self.filenames))
-                    self.xAxisBox.addItem('time (s)')
-                if 'Temperature (K)' in dat.files:
-                    self.sweep_variable_dict['Temperature (K)'] = np.zeros(len(self.filenames))
-                    self.xAxisBox.addItem('Temperature (K)')
-                for key in dat.files:
-                    if key in ['drive laser current (mA)','probe laser current (mA)','IF bandwidth (Hz)','VNA power (dBm)','Probe laser DC signal (mV)']:
+                for key in self.known_keys:
+                    if key in dat.files:
                         self.sweep_variable_dict[key] = np.zeros(len(self.filenames))
                         self.xAxisBox.addItem(key)
-                self.temperatures = np.zeros(len(self.filenames))
-                # self.times        = np.zeros(len(self.filenames))
                 for idx, filename in enumerate(self.filenames):
-                    temp = filename.split(self.separator)
-                    self.fileList.addItem(temp[-1])
-                    self.temperatures[idx] = self.get_temp_from_filename(filename)
-                    # self.times[idx]        = self.get_time_from_filename(filename)
+                    self.fileList.addItem(self.get_label_from_filename(filename))
                     temp = np.load(filename)
                     for key in self.sweep_variable_dict:
                         try:
@@ -393,8 +392,7 @@ class ResonanceDetector (QMainWindow):
     def fileListDoubleClicked(self, rescale_axes=False):
         try:
             self.current_file_index = self.fileList.currentRow()
-            T_temp = self.temperatures[self.current_file_index]
-            title  = f'T = {T_temp} K'
+            title = self.get_label_from_filename(self.filenames[self.current_file_index])
             self.current_sweep = FreqSweep(self.filenames[self.current_file_index], nyq_low=self.nyq_low, nyq_high=self.nyq_high)
 
             if self.filtered_bool:
@@ -831,7 +829,7 @@ class ResonanceDetector (QMainWindow):
             print('error fitting all files ...')
             print(e)
         
-        self.autoUpdateWidgetsSignal.emit(len(self.temperatures)-1)
+        self.autoUpdateWidgetsSignal.emit(len(self.filenames)-1)
         self.continue_fits = True
         self.FitAllButton.setEnabled(True)
         self.fitDirectionComboBox.setEnabled(True)
@@ -857,8 +855,7 @@ class ResonanceDetector (QMainWindow):
     def stop_fits_button_clicked (self):
         self.continue_fits = False
 
-    # changes here
-    def save_temp_dep_data(self):
+    def save_sweep_dep_data(self):
         if not self.all_results is None:
             if len(self.all_results)>0:
                 try:
@@ -867,30 +864,17 @@ class ResonanceDetector (QMainWindow):
                     idx = 1
                     for _, item in self.all_results.items():
                         item = np.array(item)
-                        temperatures = self.temperatures[::self.fit_direction][:len(item)]
-                        # times        = self.times[::self.fit_direction][:len(item)]
-                        ['drive laser current (mA)','probe laser current (mA)','IF bandwidth (Hz)','VNA power (dBm)','Temperature (K)','Probe laser DC signal (mV)','time (s)']
-                        save_data = np.zeros((item.shape[0],len(self.sweep_variable_dict)+item.shape[1]))
+                        save_data = np.zeros((item.shape[0], len(self.sweep_variable_dict) + item.shape[1]))
 
-                        # save_data    = np.concatenate((times[:,np.newaxis],temperatures[:, np.newaxis], item), axis=1)
                         ii = 0
-                        header=''
-                        if 'time (s)' in self.sweep_variable_dict.keys():
-                            save_data[:,ii] = self.sweep_variable_dict['time (s)'][::self.fit_direction][:len(item)]
-                            header += 'time (s),'
-                            ii+=1
-                        if 'Temperature (K)' in self.sweep_variable_dict.keys():
-                            save_data[:,ii] = self.sweep_variable_dict['Temperature (K)'][::self.fit_direction][:len(item)]
-                            header += 'Temperature (K),'
-                            ii+=1
-                        save_data[:,ii:ii+item.shape[1]] = item
-                        header += 'f0 (Hz),gamma (Hz),A,phase,real offset,imaginary offset,real slope, imaginary slope, fit window min (Hz), fit window max (Hz)'
-                        ii+=item.shape[1]
-                        for key in self.sweep_variable_dict:
-                            if key not in ['time (s)','Temperature (K)']:
+                        header = ''
+                        for key in self.known_keys:
+                            if key in self.sweep_variable_dict:
                                 save_data[:,ii] = self.sweep_variable_dict[key][::self.fit_direction][:len(item)]
-                                header += ',' + key
-                                ii+=1
+                                header += key + ','
+                                ii += 1
+                        save_data[:,ii:ii+item.shape[1]] = item
+                        header += 'f0 (Hz),gamma (Hz),A,phase,real offset,imaginary offset,real slope,imaginary slope,fit window min (Hz),fit window max (Hz)'
 
                         if self.fit_direction==1:
                             freq = str(np.round(item[0,0]/1e6,0))
@@ -935,11 +919,8 @@ class ResonanceDetector (QMainWindow):
                 temp = file.split(self.separator)[-1]
                 item = self.fileList.findItems(temp, QtCore.Qt.MatchExactly)[0]
                 item_row = self.fileList.row(item)
-                # delete element at row from fileList, self.filenames, self.temperatures, self.all_data_list
                 self.fileList.takeItem(item_row)
-                self.filenames     = np.delete(self.filenames, item_row)
-                self.temperatures  = np.delete(self.temperatures, item_row)
-                # self.times         = np.delete(self.times, item_row)
+                self.filenames = np.delete(self.filenames, item_row)
                 for key in self.sweep_variable_dict:
                     self.sweep_variable_dict[key] = np.delete(self.sweep_variable_dict[key], item_row)
                 # self.all_data_list.pop(item_row)
@@ -956,10 +937,8 @@ class ResonanceDetector (QMainWindow):
                 freqsweep = self.get_freq_sweep(file_temp, nyq_low=self.nyq_low, nyq_high=self.nyq_high)
 
                 if not freqsweep is None:
-                    self.fileList.addItem(temp[-1])
+                    self.fileList.addItem(self.get_label_from_filename(file))
                     self.filenames = np.append(self.filenames, file)
-                    self.temperatures = np.append(self.temperatures, self.get_temp_from_filename(file))
-                    # self.times        = np.append(self.times, self.get_time_from_filename(file))
                     temp = np.load(file)
                     for key in self.sweep_variable_dict:
                         try:
@@ -984,7 +963,7 @@ class ResonanceDetector (QMainWindow):
                         self.initial_guess = self.get_next_initial_guess(self.all_results, self.num_extrapolation_points)
                 # update the individual sweeps plot and resonance list with the most recently imported sweep and fit
                 if len(files_add)>0:
-                    self.autoUpdateWidgetsSignal.emit(len(self.temperatures)-1)                
+                    self.autoUpdateWidgetsSignal.emit(len(self.filenames)-1)
             else:
                 print('looks like the number of fits are not the same as the number of loaded files ...')
                 print('will try to re-run a fit on all current sweeps')

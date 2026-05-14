@@ -25,6 +25,7 @@ from instrument_libraries_and_control.temperature_control.temperature_control im
 from instrument_libraries_and_control.lockin_control.lockin_control import LockInControl
 from RDS_measure.resistivity_sweeper.data_view import DataViewer
 from RDS_measure.resistivity_sweeper.resistivity_sweeper import RhoSweeper
+from instrument_libraries_and_control.opticool_control.opticool_control import OptiCoolControl
 
 
 
@@ -72,7 +73,8 @@ class ResonatingMembranesMaster (QMainWindow):
                             'ystage': None,
                             'zstage': None,
                             'camera': None,
-                            'lockin': None}
+                            'lockin': None,
+                            'opticool': None}
         self.IPaddressesDict = deepcopy(self.deviceDict)
         self.auxCommandDict = {'aux':None}
         self.deviceManagerWindow = DeviceManager(reactor=self.reactor, parent=self, operating_system=self.operating_system)
@@ -101,12 +103,16 @@ class ResonatingMembranesMaster (QMainWindow):
         self.lockinButton.clicked.connect(self.open_lockin_window)
 
         self.resistivityWindow = RhoSweeper(reactor=self.reactor, parent=self, operating_system=self.operating_system)
-        self.resistivityButton.clicked.connect(self.open_resistivity_window)    
+        self.resistivityButton.clicked.connect(self.open_resistivity_window)
+
+        self.opticoolWindow = OptiCoolControl(reactor=self.reactor, parent=self, operating_system=self.operating_system)
+        self.opticoolButton.clicked.connect(self.open_opticool_window)
 
         # list of all windows so we can close them all when closing this window
         self.windows = [self.tempControlWindow, self.vnaMonitorWindow, self.resonanceDetectorWindow,
                         self.deviceManagerWindow, self.SweeperWindow,
-                        self.cameraWindow, self.lockinWindow, self.resistivityWindow]
+                        self.cameraWindow, self.lockinWindow, self.resistivityWindow,
+                        self.opticoolWindow]
 
         # Connect the close event to the custom function
         self.closeEvent = self.on_close_event
@@ -118,6 +124,7 @@ class ResonatingMembranesMaster (QMainWindow):
         self.cameraWindow.update_device_dict()
         self.lockinWindow.update_device_dict()
         self.resistivityWindow.update_device_dict()
+        self.opticoolWindow.update_device_dict()
 
     def open_resonance_detector(self):
         if self.resonanceDetectorWindow is None:
@@ -158,6 +165,11 @@ class ResonatingMembranesMaster (QMainWindow):
         if self.resistivityWindow is None:
             self.resistivityWindow = RhoSweeper(reactor=self.reactor, parent=self, operating_system=self.operating_system)
         self.resistivityWindow.show()
+
+    def open_opticool_window (self):
+        if self.opticoolWindow is None:
+            self.opticoolWindow = OptiCoolControl(reactor=self.reactor, parent=self, operating_system=self.operating_system)
+        self.opticoolWindow.show()
 
 
     def on_close_event(self, event):

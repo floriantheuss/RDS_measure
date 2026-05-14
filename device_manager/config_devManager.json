@@ -8,7 +8,8 @@
         "ystage": "26006755",
         "zstage": "COM3",
         "camera": "",
-        "lockin": "GPIB0::5::INSTR"
+        "lockin": "GPIB0::5::INSTR",
+        "opticool": ""
     },
     "Aux Command": "TC."
 }

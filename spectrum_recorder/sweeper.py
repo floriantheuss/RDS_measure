@@ -63,8 +63,12 @@ class Sweeper (QMainWindow):
         self.vnaDevice = self.parent.deviceDict['vna']
         self.tempDevice = self.parent.deviceDict['temperature']
         self.multimeterDevice = self.parent.deviceDict['multimeter'] # changes here
+        self.opticoolDevice = self.parent.deviceDict['opticool']
         self.f, self.X, self.Y = [], [], []
         self.temp = 0
+        self.opticool_control_temp = 0
+        self.opticool_aux_temp     = 0
+        self.opticool_field        = 0
         self.ch = self.channelBox.currentText()
         
         self.initialize_directory_widgets()
@@ -75,6 +79,7 @@ class Sweeper (QMainWindow):
         self.tempDevice = self.parent.deviceDict['temperature']
         self.vnaDevice = self.parent.deviceDict['vna']
         self.multimeterDevice = self.parent.deviceDict['multimeter']    # changes here
+        self.opticoolDevice = self.parent.deviceDict['opticool']
 
     def initialize_directory_widgets (self):
         self.save_dir = None
@@ -103,23 +108,9 @@ class Sweeper (QMainWindow):
         else:
             path = ''
 
-        if self.dateCheck.isChecked():
-            txt = datetime.today().strftime('%Y-%m-%d')
-            path = path + txt
-        if self.timeCheck.isChecked():
-            if self.dateCheck.isChecked():
-                path = path +'_'
-            txt = datetime.today().strftime('%H-%M-%S')
-            path = path + txt
-        if self.tempCheck.isChecked():
-            if self.dateCheck.isChecked() or self.timeCheck.isChecked():
-                path = path + '_'
-            temp_txt = str(self.temp)
-            path = path + f'{temp_txt}K'
+        path = path + datetime.today().strftime('%Y-%m-%d_%H-%M-%S')
         if self.customCheck.isChecked():
-            if self.dateCheck.isChecked() or self.timeCheck.isChecked() or self.tempCheck.isChecked():
-                path = path + '_'
-            path = path + self.customNameLine.text()
+            path = path + '_' + self.customNameLine.text()
 
         path = path + '.npz'
         return path
@@ -144,8 +135,6 @@ class Sweeper (QMainWindow):
             self.autoSaveButton.setStyleSheet("QPushButton#autoSaveButton {color: rgb(0, 255, 0);background-color:rgb(0, 0, 0);border: 2px solid rgb(0, 255, 0);border-radius: 5px}")
             self.autoSaveButton.setText('Start Auto Save')
             self.saveOptionBox.setEnabled(True)
-            self.dateCheck.setEnabled(True)
-            self.timeCheck.setEnabled(True)
             self.channelBox.setEnabled(True)
             self.tempCheck.setEnabled(True)
             self.customCheck.setEnabled(True)
@@ -157,6 +146,9 @@ class Sweeper (QMainWindow):
             self.probeLaserCheck.setEnabled(True)
             self.driveLaserCurrentLine.setEnabled(True)
             self.probeLaserCurrentLine.setEnabled(True)
+            self.opticoolControlTempCheck.setEnabled(True)
+            self.opticoolAuxTempCheck.setEnabled(True)
+            self.opticoolMagnetCheck.setEnabled(True)
             yield self.vnaDevice.sweep_type('LIN')
             # self.vnaDevice.abort_sweeping()
         else:
@@ -164,8 +156,6 @@ class Sweeper (QMainWindow):
             self.autoSaveButton.setStyleSheet("QPushButton#autoSaveButton {color: rgb(255, 0, 0);background-color:rgb(0, 0, 0);border: 2px solid rgb(255, 0, 0);border-radius: 5px}")
             self.autoSaveButton.setText('Stop Auto Save')
             self.saveOptionBox.setEnabled(False)
-            self.dateCheck.setEnabled(False)
-            self.timeCheck.setEnabled(False)
             self.tempCheck.setEnabled(False)
             self.channelBox.setEnabled(False)
             self.customCheck.setEnabled(False)
@@ -177,6 +167,9 @@ class Sweeper (QMainWindow):
             self.probeLaserCheck.setEnabled(False)
             self.driveLaserCurrentLine.setEnabled(True)
             self.probeLaserCurrentLine.setEnabled(True)
+            self.opticoolControlTempCheck.setEnabled(False)
+            self.opticoolAuxTempCheck.setEnabled(False)
+            self.opticoolMagnetCheck.setEnabled(False)
             self.autosave()
         return 1
     
@@ -210,8 +203,14 @@ class Sweeper (QMainWindow):
             self.temp = yield self.tempDevice.read_temp(ch=self.ch)
         if self.dcSignalCheck.isChecked():
             dcSignal = yield self.multimeterDevice.return_last_reading()
-            dcSignal = dcSignal*1000  
-        
+            dcSignal = dcSignal*1000
+        if self.opticoolControlTempCheck.isChecked() and self.opticoolDevice is not None:
+            self.opticool_control_temp, _ = self.opticoolDevice.get_temperature(thermometer='control')
+        if self.opticoolAuxTempCheck.isChecked() and self.opticoolDevice is not None:
+            self.opticool_aux_temp, _ = self.opticoolDevice.get_temperature(thermometer='aux')
+        if self.opticoolMagnetCheck.isChecked() and self.opticoolDevice is not None:
+            self.opticool_field, _ = self.opticoolDevice.get_field()
+
         IF_bandwidth = yield self.vnaDevice.IF_bandwidth()
         vna_power    = yield self.vnaDevice.output_power()
         ave_factor   = yield self.vnaDevice.averaging_factor()
@@ -225,7 +224,10 @@ class Sweeper (QMainWindow):
         meta_data_dict = {'custom text':custom_text,
                           'drive laser current (mA)':drive_laser_current, 'probe laser current (mA)':probe_laser_current,
                           'IF bandwidth (Hz)':IF_bandwidth, 'Averaging?':ave_state, 'Averaging factor':ave_factor, 'VNA power (dBm)':vna_power,
-                          'Temperature (K)':self.temp, 'Probe laser DC signal (mV)':dcSignal, 'time (s)': time()}
+                          'External Temperature (K)':self.temp, 'Probe laser DC signal (mV)':dcSignal, 'time (s)': time(),
+                          'OptiCool control temperature (K)':self.opticool_control_temp,
+                          'OptiCool aux temperature (K)':self.opticool_aux_temp,
+                          'OptiCool field (T)':self.opticool_field}
         return meta_data_dict
     
     @inlineCallbacks

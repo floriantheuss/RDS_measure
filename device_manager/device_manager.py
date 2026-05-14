@@ -13,6 +13,7 @@ from instrument_libraries_and_control.instrument_libraries.keithley_2000multimet
 from instrument_libraries_and_control.instrument_libraries.signal_recovery_7265_DSP import SignalRecovery7265
 from instrument_libraries_and_control.instrument_libraries.thorlabs_kst201_stepper_motor import ThorlabsKST201
 from instrument_libraries_and_control.instrument_libraries.thorlabs_kiralux_camera import ThorlabsKiralux
+from instrument_libraries_and_control.instrument_libraries.quantum_design_opticool import QDOptiCool
 from thorlabs_apt_device import TDC001
 
 from PyQt5.QtWidgets import (QApplication,
@@ -79,7 +80,8 @@ class DeviceManager(QMainWindow):
                                'ystage': None,
                                'zstage': None,
                                'camera': None,
-                               'lockin': None}
+                               'lockin': None,
+                               'opticool': None}
             self.IPaddressesDict = deepcopy(self.deviceDict)
             self.auxCommandDict = {'aux':None}
             # start resource manager
@@ -107,6 +109,7 @@ class DeviceManager(QMainWindow):
         self.connectXStageBtn.clicked.connect(lambda b, dev= "xstage" : self.connectDevice(b, dev))
         self.connectYStageBtn.clicked.connect(lambda b, dev= "ystage" : self.connectDevice(b, dev))
         self.connectZStageBtn.clicked.connect(lambda b, dev= "zstage" : self.connectDevice(b, dev))
+        self.connectOptiCoolBtn.clicked.connect(lambda b, dev= "opticool" : self.connectDevice(b, dev))
 
         self.reconnectAllBtn.clicked.connect(self.reconnect_all)
         
@@ -301,6 +304,17 @@ class DeviceManager(QMainWindow):
                 except Exception as e:
                     print('Could not connect to lockin device ...')
                     print(e)
+            if device == 'opticool':
+                try:
+                    opticool_device = QDOptiCool()
+                    opticool_device.connect_local()
+                    self.deviceDict[device] = opticool_device
+                    self.IPaddressesDict[device] = 'local'
+                    self.connectOptiCoolBtn.setText("Disconnect")
+                    self.connectOptiCoolBtn.setStyleSheet("QPushButton#connectOptiCoolBtn {color: rgb(255, 0, 0);background-color:rgb(0,0,0);border: 2px solid rgb(255, 0, 0);border-radius: 5px}")
+                except Exception as e:
+                    print('Could not connect to OptiCool device ...')
+                    print(e)
             if device == 'aux':
                 try:
                     IPaddress = self.auxIPAddressBox.currentText()
@@ -393,6 +407,16 @@ class DeviceManager(QMainWindow):
                     self.connectLockInBtn.setStyleSheet("QPushButton#connectLockInBtn {color: rgb(0, 255, 0);background-color:rgb(0,0,0);border: 2px solid rgb(0, 255, 0);border-radius: 5px}")
                 except Exception as e:
                     print('Could not disconnect from lockin device ...')
+                    print(e)
+            if device == 'opticool':
+                try:
+                    self.deviceDict[device].close_dev()
+                    self.deviceDict[device] = None
+                    self.IPaddressesDict[device] = None
+                    self.connectOptiCoolBtn.setText("Connect")
+                    self.connectOptiCoolBtn.setStyleSheet("QPushButton#connectOptiCoolBtn {color: rgb(0, 255, 0);background-color:rgb(0,0,0);border: 2px solid rgb(0, 255, 0);border-radius: 5px}")
+                except Exception as e:
+                    print('Could not disconnect from OptiCool device ...')
                     print(e)
             if device == 'aux':
                 try:

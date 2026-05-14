@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>477</width>
-    <height>417</height>
+    <height>457</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -52,7 +52,7 @@
       <x>10</x>
       <y>80</y>
       <width>451</width>
-      <height>351</height>
+      <height>391</height>
      </rect>
     </property>
     <property name="minimumSize">
@@ -91,11 +91,53 @@ border: 0px solid rgb(193, 193, 193);</string>
      <attribute name="title">
       <string>General Instruments</string>
      </attribute>
-     <widget class="Line" name="line">
+     <widget class="QLabel" name="label_opticool">
       <property name="geometry">
        <rect>
         <x>10</x>
         <y>210</y>
+        <width>101</width>
+        <height>18</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600; text-decoration: underline; color:#ffffff;&quot;&gt;OptiCool&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_opticool_local">
+      <property name="geometry">
+       <rect>
+        <x>120</x>
+        <y>210</y>
+        <width>241</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#aaaaaa;&quot;&gt;local connection&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="connectOptiCoolBtn">
+      <property name="geometry">
+       <rect>
+        <x>370</x>
+        <y>206</y>
+        <width>80</width>
+        <height>30</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color: rgb(0,250,0);background-color:rgb(0,0,0);border: 2px solid rgb(0,250,0);border-radius: 5px</string>
+      </property>
+      <property name="text">
+       <string>Connect</string>
+      </property>
+     </widget>
+     <widget class="Line" name="line">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>250</y>
         <width>441</width>
         <height>2</height>
        </rect>
@@ -116,7 +158,7 @@ selection-color: rgb(255, 255, 255);</string>
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>234</y>
+        <y>274</y>
         <width>55</width>
         <height>18</height>
        </rect>
@@ -129,7 +171,7 @@ selection-color: rgb(255, 255, 255);</string>
       <property name="geometry">
        <rect>
         <x>370</x>
-        <y>230</y>
+        <y>270</y>
         <width>80</width>
         <height>30</height>
        </rect>
@@ -162,12 +204,12 @@ selection-color: rgb(255, 255, 255);</string>
        <rect>
         <x>10</x>
         <y>50</y>
-        <width>91</width>
+        <width>101</width>
         <height>18</height>
        </rect>
       </property>
       <property name="text">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600; text-decoration: underline; color:#ffffff;&quot;&gt;Temperature&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600; text-decoration: underline; color:#ffffff;&quot;&gt;Ext. Temperature&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
      </widget>
      <widget class="QLineEdit" name="auxCommandLine">
@@ -177,7 +219,7 @@ selection-color: rgb(255, 255, 255);</string>
       <property name="geometry">
        <rect>
         <x>110</x>
-        <y>280</y>
+        <y>320</y>
         <width>151</width>
         <height>21</height>
        </rect>
@@ -193,9 +235,9 @@ color: rgb(0, 0, 0);</string>
      <widget class="QComboBox" name="lockinIPAddressBox">
       <property name="geometry">
        <rect>
-        <x>110</x>
+        <x>120</x>
         <y>170</y>
-        <width>251</width>
+        <width>241</width>
         <height>22</height>
        </rect>
       </property>
@@ -258,9 +300,9 @@ color: rgb(0, 0, 0);</string>
      <widget class="QComboBox" name="multimeterIPAddressBox">
       <property name="geometry">
        <rect>
-        <x>110</x>
+        <x>120</x>
         <y>130</y>
-        <width>251</width>
+        <width>241</width>
         <height>22</height>
        </rect>
       </property>
@@ -276,7 +318,7 @@ color: rgb(0, 0, 0);</string>
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>280</y>
+        <y>320</y>
         <width>141</width>
         <height>21</height>
        </rect>
@@ -302,7 +344,7 @@ color: rgb(0, 0, 0);</string>
       <property name="geometry">
        <rect>
         <x>110</x>
-        <y>234</y>
+        <y>274</y>
         <width>251</width>
         <height>22</height>
        </rect>
@@ -335,7 +377,7 @@ color: rgb(0, 0, 0);</string>
       <property name="geometry">
        <rect>
         <x>270</x>
-        <y>280</y>
+        <y>320</y>
         <width>91</width>
         <height>21</height>
        </rect>
@@ -361,7 +403,7 @@ color: rgb(0, 0, 0);</string>
       <property name="geometry">
        <rect>
         <x>380</x>
-        <y>280</y>
+        <y>320</y>
         <width>71</width>
         <height>21</height>
        </rect>
@@ -376,9 +418,9 @@ color: rgb(0, 0, 0);</string>
      <widget class="QComboBox" name="vnaIPAddressBox">
       <property name="geometry">
        <rect>
-        <x>110</x>
+        <x>120</x>
         <y>90</y>
-        <width>251</width>
+        <width>241</width>
         <height>22</height>
        </rect>
       </property>
@@ -393,9 +435,9 @@ color: rgb(0, 0, 0);</string>
      <widget class="QComboBox" name="tempIPAddressBox">
       <property name="geometry">
        <rect>
-        <x>110</x>
+        <x>120</x>
         <y>50</y>
-        <width>251</width>
+        <width>241</width>
         <height>22</height>
        </rect>
       </property>

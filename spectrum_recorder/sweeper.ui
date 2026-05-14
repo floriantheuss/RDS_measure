@@ -40,8 +40,8 @@ border: 0px solid rgb(193, 193, 193);</string>
      <widget class="QCheckBox" name="dcSignalCheck">
       <property name="geometry">
        <rect>
-        <x>164</x>
-        <y>150</y>
+        <x>20</x>
+        <y>190</y>
         <width>141</width>
         <height>20</height>
        </rect>
@@ -81,7 +81,7 @@ background-color: rgb(0, 0, 0);</string>
       <property name="geometry">
        <rect>
         <x>20</x>
-        <y>190</y>
+        <y>310</y>
         <width>211</width>
         <height>20</height>
        </rect>
@@ -93,7 +93,7 @@ selection-color: rgb(0, 0, 0);
 selection-background-color: rgb(255, 255, 255);</string>
       </property>
       <property name="text">
-       <string>Temperature (select channel)</string>
+       <string>ext. Temperature (select channel)</string>
       </property>
      </widget>
      <widget class="QLineEdit" name="customNameLine">
@@ -189,51 +189,6 @@ selection-background-color: rgb(255, 255, 255);</string>
        <bool>false</bool>
       </property>
      </widget>
-     <widget class="QCheckBox" name="timeCheck">
-      <property name="geometry">
-       <rect>
-        <x>94</x>
-        <y>150</y>
-        <width>61</width>
-        <height>20</height>
-       </rect>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">color: rgb(255, 255, 255);
-background-color: rgb(0, 0, 0);
-selection-color: rgb(0, 0, 0);
-selection-background-color: rgb(255, 255, 255);</string>
-      </property>
-      <property name="text">
-       <string>Time</string>
-      </property>
-      <property name="checked">
-       <bool>true</bool>
-      </property>
-     </widget>
-     <widget class="QCheckBox" name="dateCheck">
-      <property name="geometry">
-       <rect>
-        <x>20</x>
-        <y>150</y>
-        <width>61</width>
-        <height>20</height>
-       </rect>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">color: rgb(255, 255, 255);
-background-color: rgb(0, 0, 0);
-selection-color: rgb(0, 0, 0);
-selection-background-color: rgb(255, 255, 255);
-border-color: rgb(255, 255, 255);</string>
-      </property>
-      <property name="text">
-       <string>Date</string>
-      </property>
-      <property name="checked">
-       <bool>true</bool>
-      </property>
-     </widget>
      <widget class="QLabel" name="label_2">
       <property name="geometry">
        <rect>
@@ -292,7 +247,7 @@ selection-background-color: rgb(255, 255, 255);</string>
       <property name="geometry">
        <rect>
         <x>250</x>
-        <y>188</y>
+        <y>310</y>
         <width>51</width>
         <height>26</height>
        </rect>
@@ -338,6 +293,73 @@ background-color: rgb(255, 255, 255);</string>
       <property name="styleSheet">
        <string notr="true">color: rgb(0, 0, 0);
 background-color: rgb(255, 255, 255);</string>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="opticoolAuxTempCheck">
+      <property name="geometry">
+       <rect>
+        <x>160</x>
+        <y>150</y>
+        <width>131</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color: rgb(255, 255, 255);
+background-color: rgb(0, 0, 0);
+selection-color: rgb(0, 0, 0);
+selection-background-color: rgb(255, 255, 255);</string>
+      </property>
+      <property name="text">
+       <string>OptiCool Aux. Temp.</string>
+      </property>
+      <property name="checked">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="opticoolMagnetCheck">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>170</y>
+        <width>141</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color: rgb(255, 255, 255);
+background-color: rgb(0, 0, 0);
+selection-color: rgb(0, 0, 0);
+selection-background-color: rgb(255, 255, 255);</string>
+      </property>
+      <property name="text">
+       <string>OptiCool Magn. Field</string>
+      </property>
+      <property name="checked">
+       <bool>false</bool>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="opticoolControlTempCheck">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>150</y>
+        <width>131</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color: rgb(255, 255, 255);
+background-color: rgb(0, 0, 0);
+selection-color: rgb(0, 0, 0);
+selection-background-color: rgb(255, 255, 255);
+border-color: rgb(255, 255, 255);</string>
+      </property>
+      <property name="text">
+       <string>OptiCool Contr. Temp.</string>
+      </property>
+      <property name="checked">
+       <bool>true</bool>
       </property>
      </widget>
     </widget>
@@ -750,7 +772,7 @@ border-radius: 0px</string>
      <x>0</x>
      <y>0</y>
      <width>316</width>
-     <height>37</height>
+     <height>19</height>
     </rect>
    </property>
   </widget>
