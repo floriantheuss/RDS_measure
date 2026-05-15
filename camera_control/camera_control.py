@@ -325,7 +325,9 @@ class Camera (QMainWindow):
         print('x: ', translation[0])
         print('y: ', translation[1])
         distance = np.sqrt(translation[0]**2 + translation[1]**2)
-        self.distToRefLine.setText(str(np.round(distance, 3)))
+        self.distToRefLine.setText(str(np.round(distance, 5)))
+        self.xToRefLine.setText(str(np.round(np.abs(translation[0]), 4)))
+        self.yToRefLine.setText(str(np.round(np.abs(translation[1]), 4)))
         return -translation
 
     @inlineCallbacks
