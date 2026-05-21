@@ -1,8 +1,8 @@
 # RDS_measure
 
-A laboratory automation and data analysis package for **Resonant Drumhead Spectroscopy (RDS)** — a technique for characterizing mechanical resonances of membrane samples as a function of temperature and other experimental parameters.
+A laboratory automation and data analysis package for **Resonant Drumhead Spectroscopy (RDS)** — a technique for characterizing mechanical resonances of freely-suspended membranes as a function of a sweep parameter (e.g. temperature, magnetic field, ...).
 
-The package provides a PyQt5-based GUI that orchestrates multiple laboratory instruments, automates data acquisition, performs signal processing, and fits Lorentzian resonance models to extract physical quantities such as resonance frequency (f₀), damping (γ), and mechanical quality factor (Q = f₀/γ).
+The package provides a PyQt5-based GUI that orchestrates multiple laboratory instruments, automates data acquisition, performs signal processing, and fits Lorentzian resonance models to extract physical quantities such as resonance frequency (f₀) and damping (γ).
 
 ---
 
@@ -10,8 +10,8 @@ The package provides a PyQt5-based GUI that orchestrates multiple laboratory ins
 
 A typical RDS measurement proceeds as follows:
 
-1. **Connect instruments** via the Device Manager (VNA, temperature controller, stages, camera, lock-in amplifier)
-2. **Acquire frequency sweeps** using the Spectrum Recorder, which drives the VNA and records the complex transmission as a function of frequency, along with metadata (temperature, laser currents, VNA settings)
+1. **Connect instruments** via the Device Manager (VNA, temperature controller, stages, camera, lock-in amplifier, ...)
+2. **Acquire frequency sweeps** using the Spectrum Recorder, which drives the VNA and records the complex transmission as a function of frequency, along with metadata (temperature, laser currents, VNA settings, ...)
 3. **Process and fit** the data in the Resonance Detector, which applies band-pass filtering and fits complex Lorentzian resonance peaks
 4. **Track resonances** automatically: the Sweeper can adjust the VNA frequency window based on the last fitted resonance position
 5. **Maintain alignment** using the camera-based auto-alignment system to keep the laser spot on the sample
@@ -37,7 +37,7 @@ Hardware abstraction layer. Supports:
 - **Quantum Design OptiCool** — Cryostat/magnet system
 
 ### `spectrum_recorder/`
-Controls the VNA to record frequency sweeps. Collects metadata (temperature, laser currents, VNA settings) and saves each sweep as a `.npz` file. Supports periodic acquisition and single-scan mode with optional auto-tracking and auto-alignment.
+Controls the VNA to record frequency sweeps. Collects metadata (temperature, laser currents, VNA settings, ...) and saves each sweep as a `.npz` file. Supports periodic acquisition and single-scan mode with optional auto-tracking and auto-alignment.
 
 ### `resonance_detector/`
 Loads `.npz` or `.dat` sweep files, applies a configurable band-pass filter (Butterworth), and fits complex Lorentzian peaks using `lmfit`. Supports single-resonance manual fits and automated batch fitting across all sweep files in a directory. Results are saved as `.dat` files with full metadata.
@@ -54,13 +54,13 @@ where f₀ is the resonance frequency, γ the linewidth (damping), A the amplitu
 Live camera feed from a Thorlabs Kiralux camera with manual and automated sample alignment. Automated alignment registers the current image against a reference image using affine transforms (OpenCV) and iteratively drives the Thorlabs X/Y stages to minimize the offset.
 
 ### `resistivity_sweeper/`
-Lock-in amplifier based AC resistance/impedance measurements as a function of temperature. Plots X, Y, amplitude, and phase in real time.
+Lock-in amplifier based AC resistance/impedance measurements as a function of temperature. Plots X, Y, amplitude, and phase in real time. This is not part of the main measurements workflow, but gives the opportunity to additionally measure electrical resistivity.
 
 ---
 
 ## Installation
 
-### Quick setup
+Tested with Python 3.13.
 
 **1. Create and activate the conda environment**
 ```bash
@@ -87,54 +87,6 @@ pip install PyQt5 pyqtgraph twisted qt5reactor PyVISA pyvisa-py numpy scipy lmfi
 
 **5. Shared instrument libraries**
 - Ensure the `instrument_libraries_and_control` package (custom drivers for all instruments) is on your Python path.
-
-### Python version
-
-Python 3.13 is recommended.
-
-### Required packages
-
-Install the core dependencies with pip:
-
-```bash
-pip install PyQt5 pyqtgraph twisted qt5reactor PyVISA pyvisa-py numpy scipy lmfit matplotlib opencv-python imutils pillow pandas pyserial pythonnet thorlabs-apt-device MultiPyVu
-```
-
-| Package | Purpose |
-|---|---|
-| `PyQt5` | GUI framework (widgets, signals, `.ui` file loading) |
-| `pyqtgraph` | Fast scientific plotting inside the GUI |
-| `twisted` | Asynchronous I/O and reactor for non-blocking instrument communication |
-| `pyvisa` | GPIB/USB/TCPIP instrument communication (IEEE 488.2) |
-| `numpy` | Array operations, polynomial fitting, `.npz` file I/O |
-| `scipy` | Butterworth filters, cubic spline interpolation |
-| `lmfit` | Constrained least-squares Lorentzian fitting |
-| `matplotlib` | Supplementary plotting (camera module) |
-| `opencv-python` | Image registration and affine transforms for auto-alignment |
-| `imutils` | Image utility helpers used in alignment routines |
-
-### Instrument-specific drivers
-
-Some instruments require additional drivers or packages that are not on PyPI:
-
-| Instrument | Package / Driver |
-|---|---|
-| Thorlabs TDC001 Z-stage | `thorlabs_apt_device` — `pip install thorlabs-apt-device` |
-| Thorlabs Kiralux camera | Install ThorCam for USB drivers, then install `thorlabs_tsi_sdk` from the SDK zip (see Quick setup above and `thorlabs_instruments_notes.md` for details) |
-| Thorlabs KST201 X/Y stages | Install Kinesis software for drivers; custom Python driver in `instrument_libraries_and_control` uses `pythonnet` to call the Kinesis .NET DLLs (see `thorlabs_instruments_notes.md`) |
-| Quantum Design OptiCool | `MultiPyVu` — `pip install MultiPyVu`; custom driver in `instrument_libraries_and_control` |
-
-Additionally, a VISA backend must be installed for PyVISA to communicate with GPIB/USB instruments:
-
-```bash
-# Open-source option:
-pip install pyvisa-py
-# Or install National Instruments NI-VISA from ni.com
-```
-
-### Shared instrument libraries
-
-The package imports custom instrument driver wrappers from the `instrument_libraries_and_control` package (e.g., `keysight_e5063a`, `lakeshore_model331`, `keithley_2000multimeter`, `signal_recovery_7265_DSP`, `thorlabs_kst201_stepper_motor`, `thorlabs_kiralux_camera`, `quantum_design_opticool`). Ensure this package is installed or its parent directory is on the Python path.
 
 ---
 
