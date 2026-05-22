@@ -127,6 +127,17 @@ class Sweeper (QMainWindow):
         self.autoSaveButton.setStyleSheet("QPushButton#autoSaveButton {color: rgb(0, 255, 0);background-color:rgb(0, 0, 0);border: 2px solid rgb(0, 255, 0);border-radius: 5px}")
         self.autoSaveButton.clicked.connect(self.auto_save_button_clicked)
 
+        self.auto_stop_item_map = [
+            (self.opticoolControlTempCheck, 'OptiCool Contr. Temp. (K)'),
+            (self.opticoolAuxTempCheck,     'OptiCool Aux. Temp. (K)'),
+            (self.opticoolMagnetCheck,      'OptiCool Magn. Field (T)'),
+            (self.tempCheck,                'Ext. Temp. (K)'),
+        ]
+        for checkbox, item_string in self.auto_stop_item_map:
+            if checkbox.isChecked():
+                self.autoStopItemBox.addItem(item_string)
+            checkbox.toggled.connect(lambda checked, s=item_string: self.toggle_auto_stop_item(checked, s))
+
 # changes here
     @inlineCallbacks
     def auto_save_button_clicked (self, c=None):
@@ -256,14 +267,35 @@ class Sweeper (QMainWindow):
             yield self.vnaDevice.sweep_type('SEGM')
 
     
-    def check_auto_stop (self, current_temp):
+    def toggle_auto_stop_item(self, checked, item_string):
+        if checked:
+            self.autoStopItemBox.addItem(item_string)
+        else:
+            idx = self.autoStopItemBox.findText(item_string)
+            if idx >= 0:
+                self.autoStopItemBox.removeItem(idx)
+
+    def check_auto_stop (self):
         stop = False
-        if self.minTempBox.isChecked():
-            if current_temp<float(self.minTempLine.text()):
-                stop = True
-        if self.maxTempBox.isChecked():
-            if current_temp>float(self.maxTempLine.text()):
-                stop = True
+        if self.autoStopCheckBox.isChecked():
+            relation  = self.relationBox.currentText()
+            threshold = float(self.thresholdLine.text().strip())
+            current_item = self.autoStopItemBox.currentText()
+            if current_item == 'OptiCool Aux. Temp. (K)':
+                current_value = self.opticool_aux_temp
+            elif current_item == 'OptiCool Contr. Temp. (K)':
+                current_value = self.opticool_control_temp
+            elif current_item == 'OptiCool Magn. Field (T)':
+                current_value = self.opticool_field
+            else:
+                current_value = self.temp
+
+            if relation == '>':
+                if current_value > threshold:
+                    stop = True
+            else:
+                if current_value < threshold:
+                    stop = True
         return stop
     
     @inlineCallbacks
@@ -279,7 +311,7 @@ class Sweeper (QMainWindow):
                     
                     path = self.create_save_path()
                     np.savez_compressed(path, **save_dict)
-                    if self.check_auto_stop(self.temp):
+                    if self.check_auto_stop():
                         yield self.auto_save_button_clicked()
                 except Exception as e:
                     print('Error saving data every ... seconds ...')
@@ -325,7 +357,7 @@ class Sweeper (QMainWindow):
             
                         path = self.create_save_path()
                         np.savez_compressed(path, **save_dict)
-                        if self.check_auto_stop(self.temp):
+                        if self.check_auto_stop():
                             yield self.auto_save_button_clicked()
                         
                         if self.autoAlignBox.isChecked():

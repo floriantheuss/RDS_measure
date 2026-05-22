@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>316</width>
-    <height>514</height>
+    <height>476</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -412,8 +412,8 @@ background-color: rgb(255, 255, 255);</string>
      <widget class="QPushButton" name="autoSaveButton">
       <property name="geometry">
        <rect>
-        <x>190</x>
-        <y>410</y>
+        <x>180</x>
+        <y>380</y>
         <width>113</width>
         <height>32</height>
        </rect>
@@ -665,10 +665,10 @@ border-radius: 0px</string>
        </property>
       </widget>
      </widget>
-     <widget class="QLineEdit" name="minTempLine">
+     <widget class="QLineEdit" name="thresholdLine">
       <property name="geometry">
        <rect>
-        <x>160</x>
+        <x>230</x>
         <y>350</y>
         <width>41</width>
         <height>21</height>
@@ -681,15 +681,15 @@ border: 0px solid rgb(210, 132, 255);
 border-radius: 0px</string>
       </property>
       <property name="text">
-       <string>3</string>
+       <string>0</string>
       </property>
      </widget>
-     <widget class="QCheckBox" name="minTempBox">
+     <widget class="QCheckBox" name="autoStopCheckBox">
       <property name="geometry">
        <rect>
-        <x>30</x>
+        <x>10</x>
         <y>350</y>
-        <width>121</width>
+        <width>16</width>
         <height>20</height>
        </rect>
       </property>
@@ -702,13 +702,13 @@ border: 0px solid rgb(210, 132, 255);
 border-radius: 0px</string>
       </property>
       <property name="text">
-       <string>Temp &lt; ... ( K )</string>
+       <string/>
       </property>
      </widget>
      <widget class="QLabel" name="label_15">
       <property name="geometry">
        <rect>
-        <x>30</x>
+        <x>10</x>
         <y>320</y>
         <width>211</width>
         <height>21</height>
@@ -723,45 +723,43 @@ background-color: rgb(0, 0, 0);</string>
        <string>Auto stop params</string>
       </property>
      </widget>
-     <widget class="QCheckBox" name="maxTempBox">
+     <widget class="QComboBox" name="autoStopItemBox">
       <property name="geometry">
        <rect>
         <x>30</x>
-        <y>380</y>
-        <width>121</width>
-        <height>20</height>
-       </rect>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">color: rgb(255, 255, 255);
-background-color: rgb(0, 0, 0);
-selection-color: rgb(0, 0, 0);
-selection-background-color: rgb(255, 255, 255);
-border: 0px solid rgb(210, 132, 255);
-border-radius: 0px</string>
-      </property>
-      <property name="text">
-       <string>Temp &gt; ... ( K )</string>
-      </property>
-     </widget>
-     <widget class="QLineEdit" name="maxTempLine">
-      <property name="geometry">
-       <rect>
-        <x>160</x>
-        <y>380</y>
-        <width>41</width>
+        <y>350</y>
+        <width>151</width>
         <height>21</height>
        </rect>
       </property>
       <property name="styleSheet">
        <string notr="true">color: rgb(0, 0, 0);
-background-color: rgb(255, 255, 255);
-border: 0px solid rgb(210, 132, 255);
-border-radius: 0px</string>
+background-color: rgb(255, 255, 255);</string>
       </property>
-      <property name="text">
-       <string>300</string>
+     </widget>
+     <widget class="QComboBox" name="relationBox">
+      <property name="geometry">
+       <rect>
+        <x>190</x>
+        <y>350</y>
+        <width>31</width>
+        <height>21</height>
+       </rect>
       </property>
+      <property name="styleSheet">
+       <string notr="true">color: rgb(0, 0, 0);
+background-color: rgb(255, 255, 255);</string>
+      </property>
+      <item>
+       <property name="text">
+        <string>&gt;</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>&lt;</string>
+       </property>
+      </item>
      </widget>
     </widget>
    </widget>
