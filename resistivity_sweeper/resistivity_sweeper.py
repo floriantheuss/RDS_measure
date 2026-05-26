@@ -31,7 +31,7 @@ from datetime import datetime
 class RhoSweeper (QMainWindow):
     def __init__(self, reactor, parent=None, operating_system=None):
         super(RhoSweeper, self).__init__()
-        
+
         self.operating_system = operating_system
         if operating_system is None:
             self.operating_system = platform.system()
@@ -42,7 +42,7 @@ class RhoSweeper (QMainWindow):
         else:
             print('operating system not any of the possible options')
             print('current operating system is: ', operating_system)
-        
+
         # import ui file
         path     = str( Path(__file__).absolute() )
         temp     = path.split(self.separator)
@@ -57,18 +57,28 @@ class RhoSweeper (QMainWindow):
             temp[-1] = 'resistivity_logo.png'
             logo_path = self.separator.join(temp)
             icon = QIcon(logo_path)
-            self.setWindowIcon(icon)  
+            self.setWindowIcon(icon)
 
         self.parent  = parent
         self.reactor = reactor
+        self.opticoolDevice = None
         if self.parent is not None:
             self.lockinDevice = self.parent.deviceDict['lockin']
             self.tempDevice = self.parent.deviceDict['temperature']
+            self.opticoolDevice = self.parent.deviceDict['opticool']
         self.X, self.Y, self.amp, self.phi = np.array([]), np.array([]), np.array([]), np.array([])
         self.tempA = np.array([])
         self.tempB = np.array([])
+        self.opticool_control_temp_arr = np.array([])
+        self.opticool_aux_temp_arr = np.array([])
+        self.opticool_field_arr = np.array([])
         self.time, self.date = np.array([]), np.array([])
-        
+        self.current_tempA = 0
+        self.current_tempB = 0
+        self.opticool_control_temp = 0
+        self.opticool_aux_temp = 0
+        self.opticool_field = 0
+
         self.initialize_directory_widgets()
         self.initialize_auto_save_widgets()
 
@@ -79,19 +89,40 @@ class RhoSweeper (QMainWindow):
     def update_device_dict (self):
         self.tempDevice = self.parent.deviceDict['temperature']
         self.lockinDevice = self.parent.deviceDict['lockin']
+        self.opticoolDevice = self.parent.deviceDict['opticool']
 
     def initialize_directory_widgets (self):
         self.save_name = None
         self.fileDialog = QFileDialog()
         self.browseButton.clicked.connect(self.browse_button_clicked)
-        return 
-    
+        return
+
     def initialize_auto_save_widgets(self):
         self.autosaving = False
         self.autoSaveButton.setStyleSheet("QPushButton#autoSaveButton {color: rgb(0, 255, 0);background-color:rgb(0, 0, 0);border: 2px solid rgb(0, 255, 0);border-radius: 5px}")
         self.autoSaveButton.clicked.connect(self.auto_save_button_clicked)
         self.viewDataButton.clicked.connect(self.view_data)
-    
+
+        self.auto_stop_item_map = [
+            (self.opticoolControlTempCheck, 'OptiCool Contr. Temp. (K)'),
+            (self.opticoolAuxTempCheck,     'OptiCool Aux. Temp. (K)'),
+            (self.opticoolMagnetCheck,      'OptiCool Magn. Field (T)'),
+            (self.chACheck,                 'Temp. Ch. A (K)'),
+            (self.chBCheck,                 'Temp. Ch. B (K)'),
+        ]
+        for checkbox, item_string in self.auto_stop_item_map:
+            if checkbox.isChecked():
+                self.autoStopItemBox.addItem(item_string)
+            checkbox.toggled.connect(lambda checked, s=item_string: self.toggle_auto_stop_item(checked, s))
+
+    def toggle_auto_stop_item(self, checked, item_string):
+        if checked:
+            self.autoStopItemBox.addItem(item_string)
+        else:
+            idx = self.autoStopItemBox.findText(item_string)
+            if idx >= 0:
+                self.autoStopItemBox.removeItem(idx)
+
     def browse_button_clicked (self):
         try:
             self.save_name, file_type = self.fileDialog.getSaveFileName(self, "QFileDialog.getOpenFileNames()","","Data File (*.dat)")
@@ -119,6 +150,9 @@ class RhoSweeper (QMainWindow):
             self.directoryLine.setEnabled(True)
             self.chACheck.setEnabled(True)
             self.chBCheck.setEnabled(True)
+            self.opticoolControlTempCheck.setEnabled(True)
+            self.opticoolAuxTempCheck.setEnabled(True)
+            self.opticoolMagnetCheck.setEnabled(True)
         else:
             self.autosaving = True
             self.autoSaveButton.setStyleSheet("QPushButton#autoSaveButton {color: rgb(255, 0, 0);background-color:rgb(0, 0, 0);border: 2px solid rgb(255, 0, 0);border-radius: 5px}")
@@ -129,15 +163,14 @@ class RhoSweeper (QMainWindow):
             self.directoryLine.setEnabled(False)
             self.chACheck.setEnabled(False)
             self.chBCheck.setEnabled(False)
+            self.opticoolControlTempCheck.setEnabled(False)
+            self.opticoolAuxTempCheck.setEnabled(False)
+            self.opticoolMagnetCheck.setEnabled(False)
             yield self.autosave()
         return 1
-    
+
     @inlineCallbacks
     def create_file_header (self, c=None):
-        """
-        only need to create the file header once so can just do it here;
-        will still only create it once start button is clicked
-        """
         try:
             freq = yield self.lockinDevice.oscillator_frequency()
             amp  = yield self.lockinDevice.oscillator_voltage()
@@ -151,14 +184,20 @@ class RhoSweeper (QMainWindow):
             header+= f'\nvoltage sensitivity (V): {sensitivity}'
             if self.commentCheck.isChecked():
                 comment = self.commentLine.text()
-                header += '\n'+comment#+',,,,,,'
+                header += '\n'+comment
             header+= yield '\n'
             header += 'timestamp y-m-d h:m:s,'
             header += 'time (s),'
             if self.chACheck.isChecked():
-                header += f'temperature A (K),'
+                header += 'temperature A (K),'
             if self.chBCheck.isChecked():
-                header += f'temperature B (K),'
+                header += 'temperature B (K),'
+            if self.opticoolControlTempCheck.isChecked():
+                header += 'OptiCool control temp (K),'
+            if self.opticoolAuxTempCheck.isChecked():
+                header += 'OptiCool aux temp (K),'
+            if self.opticoolMagnetCheck.isChecked():
+                header += 'OptiCool field (T),'
             header += 'X (V),'
             header += 'Y (V),'
             header += 'amplitude (V),'
@@ -168,17 +207,30 @@ class RhoSweeper (QMainWindow):
             print('Error creating file header ...')
             print(e)
 
-    def check_auto_stop(self, current_temp):
+    def check_auto_stop(self):
         stop = False
-        if self.minTempBox.isChecked():
-            if current_temp<float(self.minTempLine.text()):
-                stop = True
-        if self.maxTempBox.isChecked():
-            if current_temp>float(self.maxTempLine.text()):
-                stop = True
+        if self.autoStopCheckBox.isChecked():
+            relation  = self.relationBox.currentText()
+            threshold = float(self.thresholdLine.text().strip())
+            current_item = self.autoStopItemBox.currentText()
+            if current_item == 'OptiCool Aux. Temp. (K)':
+                current_value = self.opticool_aux_temp
+            elif current_item == 'OptiCool Contr. Temp. (K)':
+                current_value = self.opticool_control_temp
+            elif current_item == 'OptiCool Magn. Field (T)':
+                current_value = self.opticool_field
+            elif current_item == 'Temp. Ch. A (K)':
+                current_value = self.current_tempA
+            else:
+                current_value = self.current_tempB
+            if relation == '>':
+                if current_value > threshold:
+                    stop = True
+            else:
+                if current_value < threshold:
+                    stop = True
         return stop
-   
-    # this function has changes changes here
+
     @inlineCallbacks
     def autosave (self, c=None):
         if self.save_name is not self.directoryLine.text():
@@ -189,22 +241,33 @@ class RhoSweeper (QMainWindow):
         self.X, self.Y, self.amp, self.phi = np.array([]), np.array([]), np.array([]), np.array([])
         self.tempA = np.array([])
         self.tempB = np.array([])
+        self.opticool_control_temp_arr = np.array([])
+        self.opticool_aux_temp_arr = np.array([])
+        self.opticool_field_arr = np.array([])
         self.time, self.date = np.array([]), np.array([])
         header = yield self.create_file_header()
         while self.autosaving:
-            try:                
+            try:
                 current_date = datetime.today().strftime('%Y-%m-%d %H:%M:%S')
                 self.date = np.append(self.date, current_date)
                 current_time = time()
                 self.time = np.append(self.time, current_time)
-                
-                channel = self.channelBox.currentText()
+
                 if self.chACheck.isChecked():
-                    current_tempA = yield self.tempDevice.read_temp(ch='A')
-                    self.tempA    = np.append(self.tempA, current_tempA)
+                    self.current_tempA = yield self.tempDevice.read_temp(ch='A')
+                    self.tempA = np.append(self.tempA, self.current_tempA)
                 if self.chBCheck.isChecked():
-                    current_tempB = yield self.tempDevice.read_temp(ch='B')
-                    self.tempB = np.append(self.tempB, current_tempB)
+                    self.current_tempB = yield self.tempDevice.read_temp(ch='B')
+                    self.tempB = np.append(self.tempB, self.current_tempB)
+                if self.opticoolControlTempCheck.isChecked() and self.opticoolDevice is not None:
+                    self.opticool_control_temp, _ = self.opticoolDevice.get_temperature(thermometer='control')
+                    self.opticool_control_temp_arr = np.append(self.opticool_control_temp_arr, self.opticool_control_temp)
+                if self.opticoolAuxTempCheck.isChecked() and self.opticoolDevice is not None:
+                    self.opticool_aux_temp, _ = self.opticoolDevice.get_temperature(thermometer='aux')
+                    self.opticool_aux_temp_arr = np.append(self.opticool_aux_temp_arr, self.opticool_aux_temp)
+                if self.opticoolMagnetCheck.isChecked() and self.opticoolDevice is not None:
+                    self.opticool_field, _ = self.opticoolDevice.get_field()
+                    self.opticool_field_arr = np.append(self.opticool_field_arr, self.opticool_field)
 
                 current_X = yield self.lockinDevice.measure_X(check_expand=True)
                 self.X   = np.append(self.X, current_X)
@@ -214,39 +277,38 @@ class RhoSweeper (QMainWindow):
                 self.amp = np.append(self.amp, current_amp)
                 current_phase = yield self.lockinDevice.measure_Phase()
                 self.phi = np.append(self.phi, current_phase)
-              
-                if self.chACheck.isChecked() and self.chBCheck.isChecked():
-                    save_data = np.vstack([self.date, np.round(self.time-self.time[0],2), self.tempA, self.tempB,
-                                           self.X, self.Y, self.amp, self.phi], dtype=str).T
-                elif self.chACheck.isChecked() and not self.chBCheck.isChecked():
-                    save_data = np.vstack([self.date, np.round(self.time-self.time[0],2), self.tempA,
-                                           self.X, self.Y, self.amp, self.phi], dtype=str).T
-                elif not self.chACheck.isChecked() and self.chBCheck.isChecked():
-                    save_data = np.vstack([self.date, np.round(self.time-self.time[0],2), self.tempB,
-                                           self.X, self.Y, self.amp, self.phi], dtype=str).T
-                # print(save_data)
-                np.savetxt(self.save_name,save_data,header=header,delimiter=',',fmt='%s')
 
-                if self.channelBox.currentText()=='A' and self.chACheck.isChecked():
-                    current_temp = current_tempA
-                elif self.channelBox.currentText()=='B' and self.chBCheck.isChecked():
-                    current_temp = current_tempB
-                if self.check_auto_stop(current_temp):
+                cols = [self.date, np.round(self.time-self.time[0],2)]
+                if self.chACheck.isChecked():
+                    cols.append(self.tempA)
+                if self.chBCheck.isChecked():
+                    cols.append(self.tempB)
+                if self.opticoolControlTempCheck.isChecked():
+                    cols.append(self.opticool_control_temp_arr)
+                if self.opticoolAuxTempCheck.isChecked():
+                    cols.append(self.opticool_aux_temp_arr)
+                if self.opticoolMagnetCheck.isChecked():
+                    cols.append(self.opticool_field_arr)
+                cols.extend([self.X, self.Y, self.amp, self.phi])
+                save_data = np.vstack(cols, dtype=str).T
+                np.savetxt(self.save_name, save_data, header=header, delimiter=',', fmt='%s')
+
+                if self.check_auto_stop():
                     yield self.auto_save_button_clicked()
-    
+
                 yield self.sleep(float(self.saveIntervalLine.text()))
             except Exception as e:
                 print('Error saving data ...')
                 print(e)
             yield self.sleep(float(self.saveIntervalLine.text()))
         return 1
-    
+
     #async sleep function - GUI is operable while function sleeps
     def sleep(self, secs):
         d = Deferred()
         self.reactor.callLater(secs,d.callback,'Sleeping')
         return d
-    
+
     def on_close_event(self, event):
         if not self.resistivityPlotWindow is None:
             try:
@@ -256,7 +318,6 @@ class RhoSweeper (QMainWindow):
                 self.resistivityPlotWindow = None
         # Call the default closeEvent to close the window
         super().closeEvent(event)
- 
 
 
 

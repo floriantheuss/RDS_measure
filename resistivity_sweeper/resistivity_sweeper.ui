@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>313</width>
-    <height>341</height>
+    <height>380</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -20,8 +20,8 @@
    <widget class="QPushButton" name="autoSaveButton">
     <property name="geometry">
      <rect>
-      <x>230</x>
-      <y>220</y>
+      <x>20</x>
+      <y>310</y>
       <width>71</width>
       <height>32</height>
      </rect>
@@ -39,9 +39,9 @@ background-color: rgb(255, 255, 255);</string>
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>190</y>
-      <width>201</width>
-      <height>101</height>
+      <y>217</y>
+      <width>281</width>
+      <height>85</height>
      </rect>
     </property>
     <property name="styleSheet">
@@ -59,8 +59,8 @@ border-radius: 5px</string>
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>10</y>
-       <width>181</width>
+       <y>5</y>
+       <width>141</width>
        <height>21</height>
       </rect>
      </property>
@@ -75,31 +75,12 @@ border-radius: 0px</string>
       <string>Auto stop</string>
      </property>
     </widget>
-    <widget class="QLineEdit" name="minTempLine">
+    <widget class="QCheckBox" name="autoStopCheckBox">
      <property name="geometry">
       <rect>
-       <x>140</x>
+       <x>5</x>
        <y>40</y>
-       <width>41</width>
-       <height>21</height>
-      </rect>
-     </property>
-     <property name="styleSheet">
-      <string notr="true">color: rgb(0, 0, 0);
-background-color: rgb(255, 255, 255);
-border: 0px solid rgb(210, 132, 255);
-border-radius: 0px</string>
-     </property>
-     <property name="text">
-      <string>3</string>
-     </property>
-    </widget>
-    <widget class="QCheckBox" name="minTempBox">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>40</y>
-       <width>121</width>
+       <width>16</width>
        <height>20</height>
       </rect>
      </property>
@@ -112,36 +93,57 @@ border: 0px solid rgb(210, 132, 255);
 border-radius: 0px</string>
      </property>
      <property name="text">
-      <string>Temp &lt; ... ( K )</string>
+      <string/>
      </property>
     </widget>
-    <widget class="QCheckBox" name="maxTempBox">
+    <widget class="QComboBox" name="autoStopItemBox">
      <property name="geometry">
       <rect>
-       <x>10</x>
-       <y>70</y>
-       <width>121</width>
-       <height>20</height>
+       <x>25</x>
+       <y>40</y>
+       <width>171</width>
+       <height>21</height>
       </rect>
      </property>
      <property name="styleSheet">
-      <string notr="true">color: rgb(255, 255, 255);
-background-color: rgb(0, 0, 0);
-selection-color: rgb(0, 0, 0);
-selection-background-color: rgb(255, 255, 255);
-border: 0px solid rgb(210, 132, 255);
-border-radius: 0px</string>
-     </property>
-     <property name="text">
-      <string>Temp &gt; ... ( K )</string>
+      <string notr="true">color: rgb(0, 0, 0);
+background-color: rgb(255, 255, 255);
+border-radius: 0px;
+border: rgb(0, 0, 0)</string>
      </property>
     </widget>
-    <widget class="QLineEdit" name="maxTempLine">
+    <widget class="QComboBox" name="relationBox">
      <property name="geometry">
       <rect>
-       <x>140</x>
-       <y>70</y>
-       <width>41</width>
+       <x>200</x>
+       <y>40</y>
+       <width>31</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">color: rgb(0, 0, 0);
+background-color: rgb(255, 255, 255);
+border-radius: 0px;
+border: rgb(0, 0, 0)</string>
+     </property>
+     <item>
+      <property name="text">
+       <string>&gt;</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>&lt;</string>
+      </property>
+     </item>
+    </widget>
+    <widget class="QLineEdit" name="thresholdLine">
+     <property name="geometry">
+      <rect>
+       <x>240</x>
+       <y>40</y>
+       <width>31</width>
        <height>21</height>
       </rect>
      </property>
@@ -152,41 +154,15 @@ border: 0px solid rgb(210, 132, 255);
 border-radius: 0px</string>
      </property>
      <property name="text">
-      <string>300</string>
+      <string>0</string>
      </property>
-    </widget>
-    <widget class="QComboBox" name="channelBox">
-     <property name="geometry">
-      <rect>
-       <x>130</x>
-       <y>10</y>
-       <width>51</width>
-       <height>26</height>
-      </rect>
-     </property>
-     <property name="styleSheet">
-      <string notr="true">color: rgb(0, 0, 0);
-background-color: rgb(255, 255, 255);
-border: 0px solid rgb(203, 255, 126);
-border-radius: 0px</string>
-     </property>
-     <item>
-      <property name="text">
-       <string>A</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>B</string>
-      </property>
-     </item>
     </widget>
    </widget>
    <widget class="QLabel" name="label_4">
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>150</y>
+      <y>186</y>
       <width>111</width>
       <height>21</height>
      </rect>
@@ -205,7 +181,7 @@ border-radius: 0px</string>
     <property name="geometry">
      <rect>
       <x>220</x>
-      <y>150</y>
+      <y>186</y>
       <width>51</width>
       <height>21</height>
      </rect>
@@ -345,8 +321,8 @@ selection-background-color: rgb(255, 255, 255);</string>
    <widget class="QPushButton" name="viewDataButton">
     <property name="geometry">
      <rect>
-      <x>230</x>
-      <y>260</y>
+      <x>100</x>
+      <y>310</y>
       <width>71</width>
       <height>32</height>
      </rect>
@@ -378,7 +354,7 @@ selection-background-color: rgb(255, 255, 255);</string>
      <string>Ch A</string>
     </property>
     <property name="checked">
-     <bool>true</bool>
+     <bool>false</bool>
     </property>
    </widget>
    <widget class="QCheckBox" name="chBCheck">
@@ -400,7 +376,73 @@ selection-background-color: rgb(255, 255, 255);</string>
      <string>Ch B</string>
     </property>
     <property name="checked">
+     <bool>false</bool>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="opticoolControlTempCheck">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>133</y>
+      <width>131</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">color: rgb(255, 255, 255);
+background-color: rgb(0, 0, 0);
+selection-color: rgb(0, 0, 0);
+selection-background-color: rgb(255, 255, 255);</string>
+    </property>
+    <property name="text">
+     <string>OptiCool Contr. Temp.</string>
+    </property>
+    <property name="checked">
      <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="opticoolAuxTempCheck">
+    <property name="geometry">
+     <rect>
+      <x>155</x>
+      <y>133</y>
+      <width>141</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">color: rgb(255, 255, 255);
+background-color: rgb(0, 0, 0);
+selection-color: rgb(0, 0, 0);
+selection-background-color: rgb(255, 255, 255);</string>
+    </property>
+    <property name="text">
+     <string>OptiCool Aux. Temp.</string>
+    </property>
+    <property name="checked">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="opticoolMagnetCheck">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>157</y>
+      <width>141</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">color: rgb(255, 255, 255);
+background-color: rgb(0, 0, 0);
+selection-color: rgb(0, 0, 0);
+selection-background-color: rgb(255, 255, 255);</string>
+    </property>
+    <property name="text">
+     <string>OptiCool Magn. Field</string>
+    </property>
+    <property name="checked">
+     <bool>false</bool>
     </property>
    </widget>
   </widget>
@@ -410,7 +452,7 @@ selection-background-color: rgb(255, 255, 255);</string>
      <x>0</x>
      <y>0</y>
      <width>313</width>
-     <height>37</height>
+     <height>19</height>
     </rect>
    </property>
   </widget>
